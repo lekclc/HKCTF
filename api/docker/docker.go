@@ -9,11 +9,15 @@ import (
 )
 
 func Init() {
-	apiClient, err := client.NewClientWithOpts(client.FromEnv)
+	remoteDockerURL := "unix:///var/run/docker.sock"
+	apiClient, err := client.NewClientWithOpts(
+		client.WithHost(remoteDockerURL),
+		client.WithAPIVersionNegotiation(),
+	)
 	if err != nil {
 		panic(err)
 	}
-	defer apiClient.Close()
+	//defer apiClient.Close()
 	cfg.Docker = apiClient
 }
 

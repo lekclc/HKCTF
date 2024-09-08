@@ -19,7 +19,7 @@ func Register(r *gin.Context) {
 		return
 	} else {
 		passwd = logic.Passwd_hash(passwd)
-		db.Create(&Db.User{Name: name, Passwd: passwd})
+		db.Create(&Db.User{Name: name, Passwd: passwd, ContNum: 0})
 		logic.Res_msg(r, 200, 1, "register success")
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os/exec"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +15,7 @@ func Level_Start(r *gin.Context) {
 	// 获取参数
 	db := cfg.DB
 	level_id := r.PostForm("level_id")
-	user_id__ := r.PostForm("user_id")
+	user_name, _, user_id := logic.Jwt_Info(r)
 	var level Db.Level
 	var image Db.Images
 	db.Where("ID = ?", level_id).First(&level)
@@ -31,12 +30,17 @@ func Level_Start(r *gin.Context) {
 	}
 	image_id := image.ImageID
 	image_port := strconv.Itoa(int(image.Port))
-	user_id_, _ := strconv.Atoi(user_id__)
-	user_id := uint(user_id_)
 	Level_port := uint(Get_port())
 	port := strconv.Itoa(int(Level_port))
-	flagstr := Get_Flag(user_id__, user_id)
-	cmd := exec.Command("docker", "run", "-d", "-e", "FLAG="+flagstr, "--name", user_id__+image.Name+strconv.Itoa(time.Now().Second()), "-p", port+":"+image_port, image_id)
+	flagstr := Get_Flag(user_name, uint(user_id))
+	var container Db.Container
+	db.Where("User_Id = ? AND Level_Id = ?", user_id, level_id).First(&container)
+	if container.ID != 0 {
+		logic.Res_msg(r, 500, 0, "容器已存在")
+		return
+	}
+
+	cmd := exec.Command("docker", "run", "-d", "-e", "FLAG="+flagstr, "--name", image.Name+port, "-p", port+":"+image_port, image_id)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("创建容器失败:", err)
@@ -45,7 +49,10 @@ func Level_Start(r *gin.Context) {
 		return
 	}
 	Container_ID := string(out)
-
-	db.Create(&Db.Container{ContainerID: Container_ID, Port: Level_port, Flag: flagstr, UserID: user_id})
+	flagstr = logic.Md5(flagstr)
+	db.Create(&Db.Container{ContainerID: Container_ID, Port: Level_port, Flag: flagstr, UserID: uint(user_id), LevelId: level.ID})
+	var user Db.User
+	db.Where("User_id = ?", user_id).First(&user)
+	db.Model(&user).Update("ContNum", user.ContNum+1)
 	logic.Res_msg(r, 200, 1, "ok", gin.H{"port": Level_port})
 }

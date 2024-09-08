@@ -1,9 +1,10 @@
 package Db
 
 type User struct {
-	UserID uint   `gorm:"primaryKey"`
-	Name   string `gorm:"size:100"`
-	Passwd string
+	UserID  uint   `gorm:"primaryKey"`
+	Name    string `gorm:"size:100"`
+	Passwd  string
+	ContNum int
 }
 
 type Admin struct {
@@ -32,6 +33,7 @@ type Container struct {
 	Port        uint
 	Flag        string
 	UserID      uint
+	LevelId     uint
 }
 
 type Ctf struct {

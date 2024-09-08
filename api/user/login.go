@@ -17,7 +17,7 @@ func Login(r *gin.Context) {
 	var admin Db.Admin
 	res := db.Where("name = ? AND passwd = ?", name, passwd).First(&admin)
 	if res.Error == nil {
-		token := logic.Jwt_get(name, true)
+		token := logic.Jwt_get(name, true, int(admin.UserID))
 		logic.Res_msg(r, 200, 2, "admin login success", gin.H{"token": token})
 		return
 	}
@@ -26,7 +26,7 @@ func Login(r *gin.Context) {
 	if res.Error != nil {
 		logic.Res_msg(r, 200, 0, "login failed")
 	} else {
-		token := logic.Jwt_get(name, false)
+		token := logic.Jwt_get(name, false, int(user.UserID))
 		logic.Res_msg(r, 200, 1, "user login success", gin.H{"token": token})
 	}
 }

@@ -30,7 +30,7 @@ func Init() {
 	res := db.Where("name = ?", cfg.Get("admin.name")).First(&user)
 	if res.Error != nil {
 		//找不到admin用户，创建
-		db.Create(&User{Name: cfg.Get("admin.name").(string), Passwd: admin_passwd})
+		db.Create(&User{Name: cfg.Get("admin.name").(string), Passwd: admin_passwd, ContNum: 0})
 	} else {
 		db.Model(&user).Update("passwd", admin_passwd)
 	}

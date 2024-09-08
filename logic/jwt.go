@@ -14,13 +14,15 @@ var jwtKey = []byte(viper.GetString("key.jwt"))
 type Claim struct {
 	Username string `json:"username"`
 	Auth     bool   `json:"auth"`
+	Id       int    `json:"id"`
 	jwt.RegisteredClaims
 }
 
-func Jwt_get(username string, auth bool) string {
+func Jwt_get(username string, auth bool, id int) string {
 	claims := &Claim{
 		Username: username,
 		Auth:     auth,
+		Id:       id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 		},
@@ -74,20 +76,20 @@ func Jwt_check(r *gin.Context, token string) int {
 	return 0
 }
 
-func Jwt_Info(r *gin.Context) (string, bool) {
+func Jwt_Info(r *gin.Context) (string, bool, int) {
 	token := r.GetHeader("Token")
 	if token == "" {
 		Res_msg(r, 200, 0, "no token")
-		return "", false
+		return "", false, 0
 	}
 	claims, err := Jwt_parse(token)
 	if err != nil {
 		Res_msg(r, 200, 0, "parse token failed")
-		return "", false
+		return "", false, 0
 	}
 	if time.Now().After(claims.ExpiresAt.Time) {
 		Res_msg(r, 200, 0, "token expired")
-		return "", false
+		return "", false, 0
 	}
-	return claims.Username, claims.Auth
+	return claims.Username, claims.Auth, claims.Id
 }

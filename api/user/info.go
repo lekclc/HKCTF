@@ -1,45 +1,22 @@
 package user
 
 import (
-	cfg "ctf/config"
-	Db "ctf/database"
 	"ctf/logic"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Info(r *gin.Context) {
-	name, auth := logic.Jwt_Info(r)
-	db := cfg.DB
+	name, auth, id := logic.Jwt_Info(r)
 	if !auth {
-		var user Db.User
-		res := db.Where("name = ?", name).First(&user)
-		if res.Error != nil {
-			logic.Res_msg(r, 200, 0, "user not exists")
-			return
-		}
-		r.JSON(200, gin.H{
-			"code": 1,
-			"msg":  "success",
-			"data": gin.H{
-				"username": user.Name,
-				"userId":   user.UserID,
-			},
+		logic.Res_msg(r, 200, 1, "user login success", gin.H{
+			"username": name,
+			"userId":   id,
 		})
 	} else if auth {
-		var admin Db.Admin
-		res := db.Where("name = ?", name).First(&admin)
-		if res.Error != nil {
-			logic.Res_msg(r, 200, 0, "admin not exists")
-			return
-		}
-		r.JSON(200, gin.H{
-			"code": 1,
-			"msg":  "success",
-			"data": gin.H{
-				"username": admin.Name,
-				"adminId":  admin.AdminID,
-			},
+		logic.Res_msg(r, 200, 2, "admin login success", gin.H{
+			"username": name,
+			"userId":   id,
 		})
 	}
 }
