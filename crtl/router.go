@@ -2,7 +2,6 @@ package crtl
 
 import (
 	"ctf/api/admin"
-	dcli "ctf/api/docker"
 	lcli "ctf/api/level"
 	"ctf/api/tool"
 	"ctf/api/user"
@@ -27,9 +26,6 @@ func Router_init(r *gin.Engine) *gin.Engine {
 	level.POST("/add", lcli.Level_Add)
 	level.POST("/start", lcli.Level_Start)
 	level.POST("/contdel", lcli.Cont_del)
-
-	docker := v2.Group("/docker")
-	docker.POST("/run", dcli.Run)
 
 	return r
 }

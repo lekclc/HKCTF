@@ -5,8 +5,8 @@ import (
 	Db "ctf/database"
 	"ctf/logic"
 	"fmt"
+	"os/exec"
 
-	"github.com/docker/docker/api/types/container"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,34 +21,23 @@ func Cont_del(r *gin.Context) {
 		return
 	}
 	Cont_id := cont.ContainerID
-	err := cfg.Docker.ContainerRemove(r.Request.Context(), Cont_id, container.RemoveOptions{
-		RemoveVolumes: true,
-		RemoveLinks:   true,
-		Force:         true,
-	})
-	if err != nil {
-		fmt.Println(err)
-		logic.Res_msg(r, 500, 0, "删除容器失败")
+
+	exec_str := fmt.Sprintf("docker rm -f %s", Cont_id)
+	cmd := exec.Command("sh", "-c", exec_str)
+	out, _ := cmd.CombinedOutput()
+
+	if string(out) == cont.ContainerID {
+		db.Delete(&cont)
+		var user Db.User
+		db.Where("id = ?", user_id).First(&user)
+		user.ContNum = user.ContNum - 1
+		db.Model(&user).Update("Score", user.ContNum)
+		logic.Res_msg(r, 200, 1, "ok")
 		return
 	}
-
-	/*
-		cmd := exec.Command("docker", "rm", "-f", Cont_id)
-		fmt.Println(cmd)
-		out, err := cmd.CombinedOutput()
-		if err != nil {
-			logic.Res_msg(r, 500, 0, "删除容器失败")
-			return
-		}
-		fmt.Println(string(out))
-		if string(out) == container.ContainerID {
-			db.Delete(&container)
-			logic.Res_msg(r, 200, 1, "ok")
-		}
-		logic.Res_msg(r, 500, 0, "删除容器失败")
-	*/
+	logic.Res_msg(r, 500, 0, "删除容器失败")
 
 }
-func Level_del() {
+func Level_del(r *gin.Context) {
 
 }

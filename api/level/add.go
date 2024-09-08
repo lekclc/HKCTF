@@ -29,15 +29,16 @@ func Level_Add(r *gin.Context) {
 	filename := logic.Passwd_hash(file_name+time.Now().GoString()) + ".zip"
 
 	imageName := r.PostForm("name")
-	imageName = "test"
-
 	imagePortStr := r.PostForm("port")
 	imagePort, err := strconv.Atoi(imagePortStr)
 	if err != nil {
 		logic.Res_msg(r, 400, 0, "Invalid port value")
 		return
 	}
-	imagePort = 9999
+	scorestr := r.PostForm("score")
+	modestr := r.PostForm("mode")
+	score, _ := strconv.Atoi(scorestr)
+	mode, _ := strconv.Atoi(modestr)
 
 	f, err := os.Create("tmp/" + filename)
 	if err != nil {
@@ -75,7 +76,7 @@ func Level_Add(r *gin.Context) {
 		idx += len("writing image sha256:")
 		sha256 := string(output)[idx : idx+64]
 		db := cfg.DB
-		db.Create(&Db.Level{Name: imageName, Score: 100, Mode: 1})
+		db.Create(&Db.Level{Name: imageName, Score: score, Mode: uint(mode)})
 		var level Db.Level
 		res := db.Where("name = ?", imageName).First(&level)
 		if res.Error != nil {

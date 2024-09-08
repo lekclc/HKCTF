@@ -23,6 +23,7 @@ func Init() {
 	db.AutoMigrate(&Images{})
 	db.AutoMigrate(&Container{})
 	db.AutoMigrate(&Ctf{})
+	db.AutoMigrate(&Active_level{})
 
 	admin_passwd := logic.Passwd_hash(cfg.Get("admin.password").(string))
 	var user User

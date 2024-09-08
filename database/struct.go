@@ -16,8 +16,19 @@ type Admin struct {
 type Level struct {
 	ID    uint `gorm:"primaryKey;autoIncrement"`
 	Name  string
-	Score uint
-	Mode  uint //难度系数
+	Score int
+	Mode  uint
+}
+
+type Active_level struct {
+	ID       int `gorm:"primaryKey;autoIncrement"`
+	Level_id int
+	Ok       int
+	MaxNum   int
+	MinNum   int
+	NowNum   int
+	Mode     int
+	CtfId    int
 }
 
 type Images struct {
