@@ -65,10 +65,10 @@ func Jwt_check(r *gin.Context, token string) int {
 		}
 		token_ := Jwt_update(token)
 		if claims.Auth {
-			Res_msg(r, 200, 2, "admin login success", token_)
+			Res_msg(r, 200, 2, "admin login success", gin.H{"token": token_})
 			return 2
 		}
-		Res_msg(r, 200, 1, "user login success", token_)
+		Res_msg(r, 200, 1, "user login success", gin.H{"token": token_})
 		return 1
 	}
 	return 0

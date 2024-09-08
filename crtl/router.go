@@ -25,6 +25,7 @@ func Router_init(r *gin.Engine) *gin.Engine {
 
 	level := v2.Group("/level")
 	level.POST("/add", lcli.Level_Add)
+	level.POST("/start", lcli.Level_Start)
 
 	docker := v2.Group("/docker")
 	docker.POST("/run", dcli.Run)

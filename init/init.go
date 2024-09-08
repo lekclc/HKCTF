@@ -2,6 +2,7 @@ package myinit
 
 import (
 	dcli "ctf/api/docker"
+	lcli "ctf/api/level"
 	cfg "ctf/config"
 	"ctf/crtl"
 	db "ctf/database"
@@ -14,6 +15,7 @@ func Init(s *gin.Engine) *gin.Engine {
 	crtl.Router_init(s)
 	db.Init()
 	dcli.Init()
+	lcli.Init()
 
 	return s
 }

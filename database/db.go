@@ -34,6 +34,7 @@ func Init() {
 	} else {
 		db.Model(&user).Update("passwd", admin_passwd)
 	}
+	db.Where("name = ?", cfg.Get("admin.name")).First(&user)
 	res = db.Where("name = ?", cfg.Get("admin.name")).First(&admin)
 	if res.Error != nil {
 		db.Create(&Admin{UserID: user.UserID, Name: cfg.Get("admin.name").(string), Passwd: admin_passwd})

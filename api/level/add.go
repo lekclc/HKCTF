@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 
 func Level_Add(r *gin.Context) {
 	file, header, err := r.Request.FormFile("file")
+
 	if err != nil {
 		logic.Res_msg(r, 400, 0, "上传文件错误")
 		return
@@ -25,8 +27,18 @@ func Level_Add(r *gin.Context) {
 	defer file.Close()
 	file_name := header.Filename
 	filename := logic.Passwd_hash(file_name+time.Now().GoString()) + ".zip"
-	//imageName := r.PostForm("name")
-	imageName := "test"
+
+	imageName := r.PostForm("name")
+	imageName = "test"
+
+	imagePortStr := r.PostForm("port")
+	imagePort, err := strconv.Atoi(imagePortStr)
+	if err != nil {
+		logic.Res_msg(r, 400, 0, "Invalid port value")
+		return
+	}
+	imagePort = 9999
+
 	f, err := os.Create("tmp/" + filename)
 	if err != nil {
 		logic.Res_msg(r, 500, 0, "文件保存错误")
@@ -45,11 +57,11 @@ func Level_Add(r *gin.Context) {
 	fmt.Println(dir)
 
 	cmd := exec.Command("docker", "build", "-t", imageName, dir)
-	fmt.Println(cmd)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("构建 Docker 镜像失败:", err)
 		fmt.Println("命令输出:", string(output))
+		logic.Res_msg(r, 500, 0, "构建 Docker 镜像失败")
 		os.RemoveAll(dir)
 		return
 	}
@@ -71,7 +83,7 @@ func Level_Add(r *gin.Context) {
 			os.RemoveAll(dir)
 			return
 		}
-		db.Create(&Db.Images{ImageID: sha256, Name: imageName, ID: level.ID, Port: 0})
+		db.Create(&Db.Images{ImageID: sha256, Name: imageName, ID: level.ID, Port: uint(imagePort)})
 	}
 
 	logic.Res_msg(r, 200, 1, "ok")

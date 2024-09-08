@@ -13,3 +13,6 @@ admin:
 key:
   hash: abcdefgh
   jwt: a_secret_key
+level:
+  Start_port: 30000
+  End_port: 60000
