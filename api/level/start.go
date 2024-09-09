@@ -16,6 +16,9 @@ func Level_Start(r *gin.Context) {
 	db := cfg.DB
 	level_id := r.PostForm("level_id")
 	user_name, _, user_id := logic.Jwt_Info(r)
+	if user_id == 0 {
+		return
+	}
 	var level Db.Level
 	var image Db.Images
 	db.Where("ID = ?", level_id).First(&level)

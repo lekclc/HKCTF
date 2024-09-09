@@ -12,6 +12,9 @@ import (
 
 func Cont_del(r *gin.Context) {
 	_, _, user_id := logic.Jwt_Info(r)
+	if user_id == 0 {
+		return
+	}
 	level_id := r.PostForm("level_id")
 	db := cfg.DB
 	var cont Db.Container
