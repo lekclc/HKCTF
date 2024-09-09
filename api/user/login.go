@@ -4,6 +4,7 @@ import (
 	cfg "ctf/config"
 	Db "ctf/database"
 	"ctf/logic"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,10 +12,12 @@ import (
 func Login(r *gin.Context) {
 	db := cfg.DB
 
-	name := r.PostForm("name")
 	passwd := r.PostForm("password")
+	name := r.PostForm("name")
+	fmt.Println(name, passwd)
 	passwd = logic.Passwd_hash(passwd)
 	var admin Db.Admin
+
 	res := db.Where("name = ? AND passwd = ?", name, passwd).First(&admin)
 	if res.Error == nil {
 		token := logic.Jwt_get(name, true, int(admin.UserID))

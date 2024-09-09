@@ -1,6 +1,7 @@
 package crtl
 
 import (
+	mid "ctf/Mid"
 	"ctf/api/admin"
 	lcli "ctf/api/level"
 	"ctf/api/tool"
@@ -11,6 +12,7 @@ import (
 
 func Router_init(r *gin.Engine) *gin.Engine {
 
+	r.Use(mid.Cors())
 	r.GET("/ping", tool.Ping)
 
 	r.POST("/login", user.Login)
